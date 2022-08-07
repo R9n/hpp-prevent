@@ -1,0 +1,31 @@
+{
+  "name": "hpp-prevent",
+  "version": "1.0.0",
+  "description": "express middleware to prevent http parameter pollution atack",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/R9n/hpp-prevent.git"
+  },
+  "keywords": [
+    "http",
+    "express",
+    "middleware",
+    "atack",
+    "prevent",
+    "hpp",
+    "Http parameter pollution",
+    "pollution",
+    "security",
+    "owasp"
+  ],
+  "author": "Ronaldo Ponciano",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/R9n/hpp-prevent/issues"
+  },
+  "homepage": "https://github.com/R9n/hpp-prevent#readme"
+}

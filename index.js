@@ -1,3 +1,13 @@
+let isLastParams;
+
+let forbbidenTerms;
+
+let expectedParamsToBeArray;
+
+let isToReturn400Reponse;
+
+let invalidParamMessage;
+
 function getParamByOrderChoice(queryParams, param, isToTakeLastParameter) {
   const firsArrayIndex = 0;
   const lastArrayIndex = queryParams[param].length - 1;
@@ -18,17 +28,7 @@ function handleForbiddenParam(invalidParamMessage, param, response) {
     .send(`Error. Invalid param: ${param}`);
 }
 
-module.exports = (request, response, next) => {
-  const isLastParams = true;
-
-  const forbbidenTerms = [];
-
-  const expectedParamsToBeArray = [];
-
-  const isToReturn400Reponse = true;
-
-  let invalidParamMessage;
-
+function hppPrevent(request, response, next) {
   const queryParams = { ...request.query };
 
   delete request.query;
@@ -69,4 +69,25 @@ module.exports = (request, response, next) => {
   request.query = sanitizedParams;
 
   return next();
+}
+
+module.exports = {
+  config: function ({
+    takeLastOcurrences,
+    blackList,
+    whiteList,
+    returnBadRequestReponse,
+    customInvalidParamMessage,
+  }) {
+    (isLastParams = takeLastOcurrences ? takeLastOcurrences : true),
+      (forbbidenTerms = blackList ? blackList : []),
+      (expectedParamsToBeArray = whiteList ? whiteList : []),
+      (isToReturn400Reponse = returnBadRequestReponse
+        ? returnBadRequestReponse
+        : false),
+      (invalidParamMessage = customInvalidParamMessage
+        ? customInvalidParamMessage
+        : undefined);
+  },
+  hppPrevent,
 };
