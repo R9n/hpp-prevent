@@ -7,18 +7,27 @@ function getParamByOrderChoice(queryParams, param, isToTakeLastParameter) {
     : queryParams[param][firsArrayIndex];
 }
 
+function handleForbiddenParam(invalidParamMessage, param, response) {
+  const badRequestStatusCode = 400;
+
+  if (invalidParamMessage) {
+    return response.status(badRequestStatusCode).send(invalidParamMessage);
+  }
+  return response
+    .status(badRequestStatusCode)
+    .send(`Error. Invalid param: ${param}`);
+}
+
 module.exports = (request, response, next) => {
   const isLastParams = true;
 
-  const forbbidenTerms = ["select"];
+  const forbbidenTerms = [];
 
-  const allowedTerms = ["id"];
-
+  const expectedParamsToBeArray = [];
 
   const isToReturn400Reponse = true;
 
-  const invalidParamMessage = '';
-
+  let invalidParamMessage;
 
   const queryParams = { ...request.query };
 
@@ -35,15 +44,20 @@ module.exports = (request, response, next) => {
   let sanitizedParam = "";
 
   for (const param of params) {
-    if (allowedTerms.length && allowedTerms.includes(param.trim())) {
+    if (expectedParamsToBeArray.includes(param.trim())) {
+      sanitizedParams[param] = queryParams[param];
       continue;
     }
 
-    if (forbbidenTerms.length && forbbidenTerms.includes(param.trim())) {
-      checar resposta
+    if (forbbidenTerms.includes(param.trim())) {
+      if (isToReturn400Reponse) {
+        return handleForbiddenParam(invalidParamMessage, param, response);
+      } else {
+        continue;
+      }
     }
 
-    const isParamArray = typeof queryParams[param] === "object";
+    const isParamArray = queryParams[param].constructor === Array;
 
     sanitizedParam = isParamArray
       ? getParamByOrderChoice(queryParams, param, isLastParams)
