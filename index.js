@@ -1,10 +1,10 @@
-let isLastParams;
+let isLastParams = true;
 
-let forbbidenTerms;
+let forbbidenTerms = [];
 
-let expectedParamsToBeArray;
+let expectedParamsToBeArray = [];
 
-let isToReturn400Reponse;
+let isToReturn400Reponse = false;
 
 let invalidParamMessage;
 
@@ -71,23 +71,21 @@ function hppPrevent(request, response, next) {
   return next();
 }
 
+function config({
+  takeLastOcurrences,
+  blackList,
+  whiteList,
+  returnBadRequestReponse,
+  customInvalidParamMessage,
+}) {
+  isLastParams = takeLastOcurrences;
+  forbbidenTerms = blackList;
+  expectedParamsToBeArray = whiteList;
+  isToReturn400Reponse = returnBadRequestReponse;
+  invalidParamMessage = customInvalidParamMessage;
+}
+
 module.exports = {
-  config: function ({
-    takeLastOcurrences,
-    blackList,
-    whiteList,
-    returnBadRequestReponse,
-    customInvalidParamMessage,
-  }) {
-    (isLastParams = takeLastOcurrences ? takeLastOcurrences : true),
-      (forbbidenTerms = blackList ? blackList : []),
-      (expectedParamsToBeArray = whiteList ? whiteList : []),
-      (isToReturn400Reponse = returnBadRequestReponse
-        ? returnBadRequestReponse
-        : false),
-      (invalidParamMessage = customInvalidParamMessage
-        ? customInvalidParamMessage
-        : undefined);
-  },
+  config,
   hppPrevent,
 };
