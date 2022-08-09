@@ -1,12 +1,21 @@
 let isLastParams = true;
 
-let forbbidenTerms = [];
+let forbbidenTerms = ["__proto__", "constructor"];
 
 let expectedParamsToBeArray = [];
 
 let isToReturn400Reponse = false;
 
 let invalidParamMessage;
+
+function hasPrototypeTermsInName(queryParams, param) {
+  return (
+    param.includes("__proto__") ||
+    param.includes("constructor") ||
+    queryParams[param].includes("__proto__") ||
+    queryParams[param].includes("constructor")
+  );
+}
 
 function getParamByOrderChoice(queryParams, param, isToTakeLastParameter) {
   const firsArrayIndex = 0;
@@ -44,17 +53,22 @@ function hppPrevent(request, response, next) {
   let sanitizedParam = "";
 
   for (const param of params) {
-    if (expectedParamsToBeArray.includes(param.trim())) {
-      sanitizedParams[param] = queryParams[param];
-      continue;
-    }
-
-    if (forbbidenTerms.includes(param.trim())) {
+    if (
+      hasPrototypeTermsInName(queryParams, param) ||
+      forbbidenTerms.includes(param.trim()) ||
+      forbbidenTerms.includes(queryParams[param])
+    ) {
       if (isToReturn400Reponse) {
         return handleForbiddenParam(invalidParamMessage, param, response);
       } else {
         continue;
       }
+    }
+
+    if (expectedParamsToBeArray.includes(param.trim())) {
+      sanitizedParams[param] = queryParams[param];
+
+      continue;
     }
 
     const isParamArray = queryParams[param].constructor === Array;
@@ -78,11 +92,11 @@ function config({
   returnBadRequestReponse,
   customInvalidParamMessage,
 }) {
-  isLastParams = takeLastOcurrences;
-  forbbidenTerms = blackList;
-  expectedParamsToBeArray = whiteList;
-  isToReturn400Reponse = returnBadRequestReponse;
-  invalidParamMessage = customInvalidParamMessage;
+  isLastParams = takeLastOcurrences ?? isLastParams;
+  forbbidenTerms = blackList ?? forbbidenTerms;
+  expectedParamsToBeArray = whiteList ?? expectedParamsToBeArray;
+  isToReturn400Reponse = returnBadRequestReponse ?? isToReturn400Reponse;
+  invalidParamMessage = customInvalidParamMessage ?? invalidParamMessage;
 }
 
 module.exports = {
