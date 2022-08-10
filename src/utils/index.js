@@ -16,5 +16,27 @@ function isObjectEmpty(obj) {
     }
     return true;
 }
+function hasPrototypeTermsInName(parameters, param) {
+    const stringParamContent = String(parameters[param]);
+    return (
+        param.includes('__proto__') ||
+        param.includes('constructor') ||
+        stringParamContent.includes('__proto__') ||
+        stringParamContent.includes('constructor')
+    );
+}
 
-module.exports = { isObjectEmpty, handleForbiddenParam };
+function getParamByOrderChoice(parameters, param, isToTakeLastParameter) {
+    const firsArrayIndex = 0;
+    const lastArrayIndex = parameters[param].length - 1;
+
+    return isToTakeLastParameter
+        ? parameters[param][lastArrayIndex]
+        : parameters[param][firsArrayIndex];
+}
+module.exports = {
+    isObjectEmpty,
+    handleForbiddenParam,
+    hasPrototypeTermsInName,
+    getParamByOrderChoice,
+};

@@ -288,9 +288,13 @@ describe('index.js', () => {
 
         expect(Object.getPrototypeOf(parsedRequest.query)).toBe(null);
     });
-    it('Should return a untouched request when no query parameter object is provided', () => {
+    it('Should remove invalid parameters from request body', () => {
         const request = {
-            body: { teste: 1, teste2: [1, 2] },
+            body: {
+                teste: 1,
+                teste2: [1, 2],
+                evilParameter: '__proto__.admin',
+            },
         };
         const response = {
             status: () => {
@@ -311,5 +315,6 @@ describe('index.js', () => {
         expect(result.body.teste).toBe(1);
         expect(result.body.teste2[0]).toBe(1);
         expect(result.body.teste2[1]).toBe(2);
+        expect(result.body.evilParameter).toBe(undefined);
     });
 });

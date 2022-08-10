@@ -1,22 +1,8 @@
-const { isObjectEmpty } = require('./utils/index');
-
-function hasPrototypeTermsInName(queryParams, param) {
-    return (
-        param.includes('__proto__') ||
-        param.includes('constructor') ||
-        queryParams[param].includes('__proto__') ||
-        queryParams[param].includes('constructor')
-    );
-}
-
-function getParamByOrderChoice(queryParams, param, isToTakeLastParameter) {
-    const firsArrayIndex = 0;
-    const lastArrayIndex = queryParams[param].length - 1;
-
-    return isToTakeLastParameter
-        ? queryParams[param][lastArrayIndex]
-        : queryParams[param][firsArrayIndex];
-}
+const {
+    isObjectEmpty,
+    hasPrototypeTermsInName,
+    getParamByOrderChoice,
+} = require('./utils/index');
 
 function parseRequestQuery(
     queryParams,
@@ -62,8 +48,4 @@ function parseRequestQuery(
     return { sanitizedParams, forbiddenParametersFound };
 }
 
-module.exports = {
-    parseRequestQuery,
-    getParamByOrderChoice,
-    hasPrototypeTermsInName,
-};
+module.exports = parseRequestQuery;

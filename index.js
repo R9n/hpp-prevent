@@ -1,4 +1,5 @@
-const { parseRequestQuery } = require('./src/query-parameter-parser');
+const parseRequestQuery = require('./src/query-parameter-parser');
+const parseRequestBody = require('./src/body-parser');
 const { handleForbiddenParam } = require('./src/utils/');
 
 let isLastParams = true;
@@ -16,6 +17,7 @@ function hppPrevent(request, response, next) {
     const bodyParams = { ...request.body };
 
     delete request.query;
+    delete request.body;
 
     const queryParamsSanitizeResult = parseRequestQuery(
         queryParams,
@@ -24,19 +26,29 @@ function hppPrevent(request, response, next) {
         expectedParamsToBeArray
     );
 
-    if (
-        queryParamsSanitizeResult.forbiddenParametersFound.length &&
-        isToReturn400Reponse
-    ) {
+    const bodyParamsSanitizeResult = parseRequestBody(bodyParams);
+
+    const haveForbiddenParameters =
+        bodyParamsSanitizeResult.forbiddenParametersFound.length ||
+        queryParamsSanitizeResult.forbiddenParametersFound.length;
+
+    const forbiddenParametersFound = [
+        ...bodyParamsSanitizeResult.forbiddenParametersFound,
+        ...queryParamsSanitizeResult.forbiddenParametersFound,
+    ];
+
+    if (haveForbiddenParameters && isToReturn400Reponse) {
         request.query = {};
+        request.body = {};
         return handleForbiddenParam(
             invalidParamMessage,
-            queryParamsSanitizeResult.forbiddenParametersFound,
+            forbiddenParametersFound,
             response
         );
     }
 
     request.query = queryParamsSanitizeResult.sanitizedParams;
+    request.body = bodyParamsSanitizeResult.sanitizedParams;
 
     return next();
 }
