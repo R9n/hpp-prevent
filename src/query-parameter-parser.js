@@ -62,4 +62,8 @@ function parseRequestQuery(
     return { sanitizedParams, forbiddenParametersFound };
 }
 
-module.exports = parseRequestQuery;
+module.exports = {
+    parseRequestQuery,
+    getParamByOrderChoice,
+    hasPrototypeTermsInName,
+};

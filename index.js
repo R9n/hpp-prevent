@@ -1,4 +1,4 @@
-const parseRequestQuery = require('./src/query-parameter-parser');
+const { parseRequestQuery } = require('./src/query-parameter-parser');
 const { handleForbiddenParam } = require('./src/utils/');
 
 let isLastParams = true;

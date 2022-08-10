@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 const HppPrevent = require('../index');
 
-describe('Main module', () => {
+describe('index.js', () => {
     it('Should return a correct parsed query object when any property is passed twice', () => {
         const request = {
             query: {
