@@ -4,7 +4,7 @@
   "description": "express middleware to prevent http parameter pollution atack",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest --collect-coverage"
   },
   "repository": {
     "type": "git",
@@ -29,6 +29,17 @@
   },
   "homepage": "https://github.com/R9n/hpp-prevent#readme",
   "devDependencies": {
-    "jest": "^28.1.3"
+    "eslint": "^8.21.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-prettier-standard": "^4.0.1",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.2.4",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-promise": "^6.0.0",
+    "jest": "^28.1.3",
+    "prettier": "^2.7.1",
+    "prettier-config-standard": "^5.0.0"
   }
 }

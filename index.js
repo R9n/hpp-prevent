@@ -1,105 +1,109 @@
-let isLastParams = true;
+let isLastParams = true
 
-let forbbidenTerms = ["__proto__", "constructor"];
+let forbiddenTerms = ['__proto__', 'constructor']
 
-let expectedParamsToBeArray = [];
+let expectedParamsToBeArray = []
 
-let isToReturn400Reponse = false;
+let isToReturn400Reponse = false
 
-let invalidParamMessage;
+let invalidParamMessage
 
 function hasPrototypeTermsInName(queryParams, param) {
-  return (
-    param.includes("__proto__") ||
-    param.includes("constructor") ||
-    queryParams[param].includes("__proto__") ||
-    queryParams[param].includes("constructor")
-  );
+    return (
+        param.includes('__proto__') ||
+        param.includes('constructor') ||
+        queryParams[param].includes('__proto__') ||
+        queryParams[param].includes('constructor')
+    )
 }
 
 function getParamByOrderChoice(queryParams, param, isToTakeLastParameter) {
-  const firsArrayIndex = 0;
-  const lastArrayIndex = queryParams[param].length - 1;
+    const firsArrayIndex = 0
+    const lastArrayIndex = queryParams[param].length - 1
 
-  return isToTakeLastParameter
-    ? queryParams[param][lastArrayIndex]
-    : queryParams[param][firsArrayIndex];
+    return isToTakeLastParameter
+        ? queryParams[param][lastArrayIndex]
+        : queryParams[param][firsArrayIndex]
 }
 
 function handleForbiddenParam(invalidParamMessage, param, response) {
-  const badRequestStatusCode = 400;
+    const badRequestStatusCode = 400
 
-  if (invalidParamMessage) {
-    return response.status(badRequestStatusCode).send(invalidParamMessage);
-  }
-  return response
-    .status(badRequestStatusCode)
-    .send(`Error. Invalid param: ${param}`);
+    if (invalidParamMessage) {
+        return response.status(badRequestStatusCode).send(invalidParamMessage)
+    }
+    return response
+        .status(badRequestStatusCode)
+        .send(`Error. Invalid param: ${param}`)
 }
 
 function hppPrevent(request, response, next) {
-  const queryParams = { ...request.query };
+    const queryParams = { ...request.query }
 
-  delete request.query;
+    delete request.query
 
-  if (!queryParams) {
-    return next();
-  }
-
-  const sanitizedParams = Object.create(null);
-
-  const params = Object.keys(queryParams);
-
-  let sanitizedParam = "";
-
-  for (const param of params) {
-    if (
-      hasPrototypeTermsInName(queryParams, param) ||
-      forbbidenTerms.includes(param.trim()) ||
-      forbbidenTerms.includes(queryParams[param])
-    ) {
-      if (isToReturn400Reponse) {
-        return handleForbiddenParam(invalidParamMessage, param, response);
-      } else {
-        continue;
-      }
+    if (!queryParams) {
+        return next()
     }
 
-    if (expectedParamsToBeArray.includes(param.trim())) {
-      sanitizedParams[param] = queryParams[param];
+    const sanitizedParams = Object.create(null)
 
-      continue;
+    const params = Object.keys(queryParams)
+
+    let sanitizedParam = ''
+
+    for (const param of params) {
+        if (
+            hasPrototypeTermsInName(queryParams, param) ||
+            forbiddenTerms.includes(param.trim()) ||
+            forbiddenTerms.includes(queryParams[param])
+        ) {
+            if (isToReturn400Reponse) {
+                return handleForbiddenParam(
+                    invalidParamMessage,
+                    param,
+                    response
+                )
+            } else {
+                continue
+            }
+        }
+
+        if (expectedParamsToBeArray.includes(param.trim())) {
+            sanitizedParams[param] = queryParams[param]
+
+            continue
+        }
+
+        const isParamArray = queryParams[param].constructor === Array
+
+        sanitizedParam = isParamArray
+            ? getParamByOrderChoice(queryParams, param, isLastParams)
+            : queryParams[param]
+
+        sanitizedParams[param] = sanitizedParam
     }
 
-    const isParamArray = queryParams[param].constructor === Array;
+    request.query = sanitizedParams
 
-    sanitizedParam = isParamArray
-      ? getParamByOrderChoice(queryParams, param, isLastParams)
-      : queryParams[param];
-
-    sanitizedParams[param] = sanitizedParam;
-  }
-
-  request.query = sanitizedParams;
-
-  return next();
+    return next()
 }
 
 function config({
-  takeLastOcurrences,
-  blackList,
-  whiteList,
-  returnBadRequestReponse,
-  customInvalidParamMessage,
+    takeLastOcurrences,
+    blackList,
+    whiteList,
+    returnBadRequestReponse,
+    customInvalidParamMessage,
 }) {
-  isLastParams = takeLastOcurrences ?? isLastParams;
-  forbbidenTerms = blackList ?? forbbidenTerms;
-  expectedParamsToBeArray = whiteList ?? expectedParamsToBeArray;
-  isToReturn400Reponse = returnBadRequestReponse ?? isToReturn400Reponse;
-  invalidParamMessage = customInvalidParamMessage ?? invalidParamMessage;
+    isLastParams = takeLastOcurrences ?? isLastParams
+    forbiddenTerms = blackList ?? forbiddenTerms
+    expectedParamsToBeArray = whiteList ?? expectedParamsToBeArray
+    isToReturn400Reponse = returnBadRequestReponse ?? isToReturn400Reponse
+    invalidParamMessage = customInvalidParamMessage ?? invalidParamMessage
 }
 
 module.exports = {
-  config,
-  hppPrevent,
-};
+    config,
+    hppPrevent,
+}
