@@ -1,6 +1,7 @@
 ## HPP-PREVENT
 
-[![Codecov Coverage](https://img.shields.io/codecov/c/github/<R9n>/<hpp-prevent/<main>.svg?style=flat-square)](https://codecov.io/gh/<R9n>/<hpp-prevent>/)
+![buils](https://img.shields.io/appveyor/build/R9n/hpp-prevent)
+[![codecov](https://codecov.io/gh/R9n/hpp-prevent/branch/main/graph/badge.svg?token=6I00XDYH40)](https://codecov.io/gh/R9n/hpp-prevent)
 
 ### Express middleware for prevent **_http parameter pollution_**
 
@@ -58,11 +59,12 @@ Hope this package help you to make your api more secure 😀😀
 
 #### License
 
-MIT
+![buils](https://img.shields.io/bower/l/mi)
 
 #### About the author
 
 Dev, System Analyst, Gamer :D
 
 **_LinkedIn_**: www.linkedin.com/in/ronaldo-mp
+
 **_Github_**: https://github.com/R9n
