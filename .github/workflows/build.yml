@@ -30,4 +30,4 @@ jobs:
               run: |
                   curl -Os https://uploader.codecov.io/latest/linux/codecov
                   chmod +x codecov
-                  ./coverage/coverage-final.json -t ${{secrets.CODECOV_TOKEN}}
+                  ./coverage/clover.xml -t ${{secrets.CODECOV_TOKEN}}
