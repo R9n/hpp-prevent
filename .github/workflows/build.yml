@@ -4,30 +4,30 @@ name: CI
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
-  push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
+    # Triggers the workflow on push or pull request events but only for the "main" branch
+    push:
+        branches: ['main']
+    pull_request:
+        branches: ['main']
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+    # Allows you to run this workflow manually from the Actions tab
+    workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+    build:
+        runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v3
+        steps:
+            - uses: actions/checkout@v3
 
-      - name: Install npm packages
-        run: npm i
+            - name: Install npm packages
+              run: npm i
 
-      - name: Run tests
-        run: npm run test
+            - name: Run tests
+              run: npm run test
 
-      - name: upload coverage do codecov
-        run: |
-          curl -Os https://uploader.codecov.io/latest/linux/codecov
-          chmod +x codecov
-          ./codecov -t ${{secrets.CODECOV_TOKEN}}
+            - name: upload coverage do codecov
+              run: |
+                  curl -Os https://uploader.codecov.io/latest/linux/codecov
+                  chmod +x codecov
+                  ./coverage -t ${{secrets.CODECOV_TOKEN}}

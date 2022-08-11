@@ -1,6 +1,8 @@
-# HPP-PREVENT
+## HPP-PREVENT
 
-## Express middleware for prevent **_http parameter pollution_**
+[![Codecov Coverage](https://img.shields.io/codecov/c/github/<R9n>/<hpp-prevent/<main>.svg?style=flat-square)](https://codecov.io/gh/<R9n>/<hpp-prevent>/)
+
+### Express middleware for prevent **_http parameter pollution_**
 
 hpp-prevent is a middleware for express to prevent hpp (http param pollution) attack
 
