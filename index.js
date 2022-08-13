@@ -70,4 +70,6 @@ function config({
 module.exports = {
     config,
     hppPrevent,
+    parseRequestQuery,
+    parseRequestBody,
 };
