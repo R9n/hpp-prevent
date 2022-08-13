@@ -294,6 +294,7 @@ describe('index.js', () => {
             body: {
                 teste: 1,
                 teste2: [1, 2],
+                '__proto__.admin': true,
             },
         };
         const response = {
@@ -315,5 +316,51 @@ describe('index.js', () => {
         expect(result.body.teste).toBe(1);
         expect(result.body.teste2[0]).toBe(1);
         expect(result.body.teste2[1]).toBe(2);
+        expect(result.body['__proto__.admin']).toBe(undefined);
+    });
+    it('Should ignore invalid parameters from request body', () => {
+        const request = {
+            query: {},
+            body: {
+                teste: 1,
+                teste2: [1, 2],
+                '__proto__.admin': true,
+            },
+        };
+        const response = {
+            status: () => {
+                return {
+                    send: (message) => {
+                        return message;
+                    },
+                };
+            },
+        };
+
+        const next = () => {
+            return request;
+        };
+        HppPrevent.config({ canIgnoreBodyParse: true });
+
+        const result = HppPrevent.hppPrevent(request, response, next);
+
+        expect(result.body.teste).toBe(1);
+        expect(result.body.teste2[0]).toBe(1);
+        expect(result.body.teste2[1]).toBe(2);
+        expect(result.body['__proto__.admin']).toBe(true);
+    });
+
+    it('Should reset the lib configuration', () => {
+        HppPrevent.config({ canIgnoreBodyParse: true });
+
+        const modifiedConfig = HppPrevent.getCurrentConfig();
+
+        expect(modifiedConfig.ignoreBodyParse).toBe(true);
+
+        HppPrevent.resetConfig();
+
+        const originalConfig = HppPrevent.getCurrentConfig();
+
+        expect(originalConfig.ignoreBodyParse).toBe(false);
     });
 });

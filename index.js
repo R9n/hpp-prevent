@@ -2,15 +2,19 @@ const parseRequestQuery = require('./src/query-parameter-parser');
 const parseRequestBody = require('./src/body-parser');
 const { handleForbiddenParam } = require('./src/utils/');
 
-let isLastParams = true;
+const defaultParameters = require('./src/initial-parameters');
 
-let forbiddenTerms = ['__proto__', 'constructor'];
+let isLastParams = defaultParameters.isLastParams;
 
-let expectedParamsToBeArray = [];
+let forbiddenTerms = defaultParameters.forbiddenTerms;
 
-let isToReturn400Reponse = false;
+let expectedParamsToBeArray = defaultParameters.expectedParamsToBeArray;
 
-let invalidParamMessage;
+let isToReturn400Reponse = defaultParameters.isToReturn400Reponse;
+
+let invalidParamMessage = defaultParameters.invalidParamMessage;
+
+let ignoreBodyParse = defaultParameters.ignoreBodyParse;
 
 function hppPrevent(request, response, next) {
     const queryParams = { ...request.query };
@@ -26,7 +30,9 @@ function hppPrevent(request, response, next) {
         expectedParamsToBeArray
     );
 
-    const bodyParamsSanitizeResult = parseRequestBody(bodyParams);
+    const bodyParamsSanitizeResult = ignoreBodyParse
+        ? { forbiddenParametersFound: [], sanitizedParams: bodyParams }
+        : parseRequestBody(bodyParams);
 
     const haveForbiddenParameters =
         bodyParamsSanitizeResult.forbiddenParametersFound.length ||
@@ -53,18 +59,52 @@ function hppPrevent(request, response, next) {
     return next();
 }
 
+function resetConfig() {
+    isLastParams = defaultParameters.isLastParams;
+
+    forbiddenTerms = defaultParameters.forbiddenTerms;
+
+    expectedParamsToBeArray = defaultParameters.expectedParamsToBeArray;
+
+    isToReturn400Reponse = defaultParameters.isToReturn400Reponse;
+
+    invalidParamMessage = defaultParameters.invalidParamMessage;
+
+    ignoreBodyParse = defaultParameters.ignoreBodyParse;
+}
+
+function getCurrentConfig() {
+    return {
+        isLastParams,
+        forbiddenTerms,
+        expectedParamsToBeArray,
+        isToReturn400Reponse,
+        invalidParamMessage,
+        ignoreBodyParse,
+    };
+}
 function config({
     takeLastOcurrences,
     blackList,
     whiteList,
     returnBadRequestReponse,
     customInvalidParamMessage,
+    canIgnoreBodyParse,
 }) {
-    isLastParams = takeLastOcurrences ?? isLastParams;
-    forbiddenTerms = blackList ?? forbiddenTerms;
-    expectedParamsToBeArray = whiteList ?? expectedParamsToBeArray;
-    isToReturn400Reponse = returnBadRequestReponse ?? isToReturn400Reponse;
-    invalidParamMessage = customInvalidParamMessage ?? invalidParamMessage;
+    isLastParams = takeLastOcurrences ?? defaultParameters.isLastParams;
+
+    forbiddenTerms = blackList ?? defaultParameters.forbiddenTerms;
+
+    expectedParamsToBeArray =
+        whiteList ?? defaultParameters.expectedParamsToBeArray;
+
+    isToReturn400Reponse =
+        returnBadRequestReponse ?? defaultParameters.isToReturn400Reponse;
+
+    invalidParamMessage =
+        customInvalidParamMessage ?? defaultParameters.invalidParamMessage;
+
+    ignoreBodyParse = canIgnoreBodyParse ?? defaultParameters.ignoreBodyParse;
 }
 
 module.exports = {
@@ -72,4 +112,6 @@ module.exports = {
     hppPrevent,
     parseRequestQuery,
     parseRequestBody,
+    resetConfig,
+    getCurrentConfig,
 };
