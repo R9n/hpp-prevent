@@ -5,35 +5,33 @@ on:
         branches: ['main', 'develop']
     pull_request:
         branches: ['main', 'develop']
-
-  jobs:
-    dev-check:
-        if: ${{ github.ref == 'refs/heads/develop' }}
-        build:
-            runs-on: ubuntu-latest
-            steps:
-                - uses: actions/checkout@v3
-
-                - name: Install npm packages
+      jobs:
+        dev-check:
+        if: contains(fromJson('["refs/heads/develop"]'), github.ref)
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v3
+          - name: Execute tests
+            run: 
+              - name: Install npm packages
                   run: npm i
-
-                - name: Run tests
+              - name: Run tests
                   run: npm run test
-    prod-check:
-        if: ${{ github.ref == 'refs/heads/main' }}
-        build:
-            runs-on: ubuntu-latest
-            steps:
-                - uses: actions/checkout@v3
-
-                - name: Install npm packages
+               
+        prod-check:
+        if: contains(fromJson('["refs/heads/main"]'), github.ref)
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v3
+          - name: Execute tests
+            run: 
+              - name: Install npm packages
                   run: npm i
-
-                - name: Run tests
+              - name: Run tests
                   run: npm run test
-
-                - name: upload coverage do codecov
+              - name: upload coverage do codecov
                   run: |
                       curl -Os https://uploader.codecov.io/latest/linux/codecov
                       chmod +x codecov
                       ./codecov -t ${{secrets.CODECOV_TOKEN}}
+                
