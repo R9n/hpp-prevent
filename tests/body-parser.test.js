@@ -5,13 +5,21 @@ const bodyParser = require('../src/body-parser');
 describe('body-parser.js', () => {
     it("Should detect object with key with prototype's pattern", () => {
         const body = {
+            query: {},
             param: 'teste',
-            param2: '__proto__',
+            '__proto__.admin': 'true',
         };
 
         const result1 = bodyParser(body);
 
         expect(result1.sanitizedParams.param).toBe('teste');
-        expect(result1.forbiddenParametersFound[0]).toBe('param2');
+    });
+
+    it("Should return bodyParams can't be undefined error when bodyParam property is not provided", () => {
+        const body = undefined;
+
+        expect(() => {
+            bodyParser(body);
+        }).toThrow("bodyParams can't be undefined");
     });
 });

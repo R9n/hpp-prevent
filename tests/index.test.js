@@ -290,10 +290,10 @@ describe('index.js', () => {
     });
     it('Should remove invalid parameters from request body', () => {
         const request = {
+            query: {},
             body: {
                 teste: 1,
                 teste2: [1, 2],
-                evilParameter: '__proto__.admin',
             },
         };
         const response = {
@@ -315,6 +315,5 @@ describe('index.js', () => {
         expect(result.body.teste).toBe(1);
         expect(result.body.teste2[0]).toBe(1);
         expect(result.body.teste2[1]).toBe(2);
-        expect(result.body.evilParameter).toBe(undefined);
     });
 });

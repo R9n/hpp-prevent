@@ -12,9 +12,46 @@ hpp-prevent is a middleware for express to prevent hpp (http param pollution) at
 hpp is a type of attack where an external attacker adds parameters with the same name to a given endpoint. This, depending on the platform used, can generate unexpected behavior of the systems. Is the case of **_Express_**, more than one parameter with the same name will be added in an array.
 Or worse, this can override some valid parameters.
 
+#### hpp-atack example
+
+**_endpoint:_** `https://your-api.com/name=value1&lastname=value2`
+The atacker can add more parameters with the same name to the enpoint url, this way.
+**_endpoint:_** `https://your-api.com/name=value1&lastname=value2&name=value3&lastname=value4`
+
+And then, in your backend you will get this output when you access the **_request.query_** object
+
+```
+{
+name: ['value1','value3'],
+lastname: ['value2','value4']
+}
+```
+
+When this was the object you expected
+
+```
+{
+name: 'value1',
+lastname: 'value2'
+}
+```
+
+This attack is normally used as a gateway to more sophisticated attacks, however, its destructive capacity should not be underestimated.
+
 #### And how **_hpp-prevent_** solve this problem ?
 
 **_hpp-prevent_** lets you configure the behavior of Express, you can choose to take the last or the first occurrence of some parameter when some parameter is passed more than one time. This is important because, sometimes you have to match the order of Express and other firewall systems, if this order of validation mismatch, your validation will be bypassed.
+
+Using this middleware, this polluted **_endpoint:_** `https://your-api.com/name=value1&lastname=value2&name=value3&lastname=value4` will result in a safe **_request.query_** object, like this.
+
+```
+{
+name: 'value1',
+lastname: 'value2'
+}
+```
+
+[`***Click here for a More detailed explanation about http pollution (By Owasp)***`](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/04-Testing_for_HTTP_Parameter_Pollution)
 
 #### How to use
 
@@ -52,6 +89,52 @@ hppPrevent.config({
 #### Third, set the express app to use the middleware
 
 `app.use(hppPrevent.hppPrevent)`
+
+#### How to use as a endpoint level middleware
+
+If you don't want to apply the middleware to all your endpoints, you can use it only on certain endpoints, this way
+
+```
+app.get('/your-endpoint',httpPrevent.hppPrevent,(request,response)=>{
+  /// This way the middleware will be applied only on this endpoint
+})
+```
+
+#### How to use the exposed **_parseRequestQuery_** and **_parseRequestBody_** methods
+
+In case you want to do the validation only in specific cases inside your endpoint, you can use the **_parseRequestQuery_** functions and **_parseRequestBody_** in separate ways to validate only the data you want and in the situation you want.
+
+**_parseRequestBody_** receives theses arguments:
+**_bodyParams_** : Object with request body , the request.body object
+**_returns_**: Return a dto like
+
+```
+{
+    sanitizedParams, // body parameters sanitized
+    forbiddenParametersFound  // forbidden properties found in body object and removed from teh sanitized parameters
+}
+```
+
+**_parseRequestQuery_** receives theses arguments:
+
+**_queryParams_**: Object with query parameters, the request.query object
+
+**_isLastParams_** : Boolean value to set the parameter's order, if false, take the first
+
+occurance, otherwise take the last occurance
+
+**_forbiddenTerms_**: List with the terms that you want to explicity block from query parameters
+
+**_expectedParamsToBeArray_**: List with the params that you expect to be array in the query parameters
+
+**_returns_**: Return a dto like
+
+```
+{
+    sanitizedParams, // query parameters sanitized
+     forbiddenParametersFound  // forbidden properties found in query object and removed from teh sanitized parameters
+}
+```
 
 That 's all !!
 

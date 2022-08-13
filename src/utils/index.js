@@ -26,6 +26,10 @@ function hasPrototypeTermsInName(parameters, param) {
     );
 }
 
+function hasPrototypeTermInTopLevelTerms(param) {
+    return param.includes('__proto__') || param.includes('constructor');
+}
+
 function getParamByOrderChoice(parameters, param, isToTakeLastParameter) {
     const firsArrayIndex = 0;
     const lastArrayIndex = parameters[param].length - 1;
@@ -39,4 +43,5 @@ module.exports = {
     handleForbiddenParam,
     hasPrototypeTermsInName,
     getParamByOrderChoice,
+    hasPrototypeTermInTopLevelTerms,
 };
