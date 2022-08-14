@@ -5,7 +5,7 @@
 
 [![Generic badge](https://img.shields.io/badge/codestyle-standart-<COLOR>.svg)](https://shields.io/)
 
-[![Generic badge](https://img.shields.io/badge/dependences-0-<COLOR>.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/dependencies-0-<COLOR>.svg)](https://shields.io/)
 
 ### Express middleware for prevent **_http parameter pollution_**
 
@@ -107,13 +107,13 @@ app.get('/your-endpoint',httpPrevent.hppPrevent,(request,response)=>{
 })
 ```
 
-#### How to use the exposed **_parseRequestQuery_** and **_parseRequestBody_** methods
+#### How to use the exposed **parseParams** method
 
-In case you want to do the validation only in specific cases inside your endpoint, you can use the **_parseRequestQuery_** functions and **_parseRequestBody_** in separate ways to validate only the data you want and in the situation you want. This method will remove any and all top-level properties from the request.body object that contain any reference to the javascript **_prototype_** object access terms to help prevent another type of attack, the [**Prototype Pollution Attack**](https://learn.snyk.io/lessons/prototype-pollution/javascript/).
+In case you want to do the validation only in specific cases inside your endpoint, you can use the **parseParams** method to validate only the data you want and in the situation you want. This method will additionally remove any and all top-level properties from the request.body object that contain any reference to the javascript **prototype** object access terms to help prevent another type of attack, the [**Prototype Pollution Attack**](https://learn.snyk.io/lessons/prototype-pollution/javascript/).
 
-**_parseRequestBody_** receives theses arguments:
-**_bodyParams_** : Object with request body , the request.body object
-**_returns_**: Return a dto like
+**parseRequestBody** receives theses arguments:
+**bodyParams** : Object with request body , the request.body object
+**returns**: Return a dto like
 
 ```
 {
@@ -122,24 +122,24 @@ In case you want to do the validation only in specific cases inside your endpoin
 }
 ```
 
-**_parseRequestQuery_** receives theses arguments:
+**parseParams** method receives theses arguments:
 
-**_queryParams_**: Object with query parameters, the request.query object
+**objectParams**: Object with query parameters, the request.query object
 
-**_isLastParams_** : Boolean value to set the parameter's order, if false, take the first
+**isLastParams** : Boolean value to set the parameter's order, if false, take the first
 
 occurance, otherwise take the last occurance
 
-**_forbiddenTerms_**: List with the terms that you want to explicity block from query parameters
+**forbiddenTerms**: List with the terms that you want to explicity block from query parameters
 
-**_expectedParamsToBeArray_**: List with the params that you expect to be array in the query parameters
+**expectedParamsToBeArray**: List with the params that you expect to be array in the query parameters
 
-**_returns_**: Return a dto like
+**returns**: Return a dto like
 
 ```
 {
-    sanitizedParams, // query parameters sanitized
-     forbiddenParametersFound  // forbidden properties found in query object and removed from teh sanitized parameters
+    sanitizedParams, // sanitized parameters
+     forbiddenParametersFound  // forbidden properties found in object and removed from the sanitized parameters
 }
 ```
 
@@ -162,6 +162,8 @@ If you, for some reason, need to retrive the current lib configuration you can d
 ```
 
 And, if you want to reset lib configuration to the original state, to aply different behavior to another endpoint for example, you can do this calling teh method **resetConfig** method;
+
+# **_VERY IMPORTANT_**
 
 That 's all !!
 

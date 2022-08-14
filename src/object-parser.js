@@ -6,18 +6,18 @@ const {
 } = require('./utils/index');
 
 /**
-@param queryParams object with query parameters, the request.query object
+@param objectParams object with query or body parameters
 @param isLastParams boolean value to set the parameter's order, if false, take the first occurance, otherwise take the last occurance
 @param forbiddenTerms list with the terms that you want to explicity block from query parameters
 @param expectedParamsToBeArray list with the params that you expect to be array in the query parameters
 @returns Return  a dto like
 {
-    sanitizedParams, // query parameters sanitized
-     forbiddenParametersFound  // forbidden properties found in query object and removed from teh sanitized parameters
+    sanitizedParams, // object parameters sanitized
+     forbiddenParametersFound  // forbidden properties found in objectParams and removed from teh sanitized parameters
 }
 **/
 function parseRequestQuery(
-    queryParams,
+    objectParams,
     isLastParams,
     forbiddenTerms,
     expectedParamsToBeArray
@@ -31,39 +31,40 @@ function parseRequestQuery(
         "expectedParamsToBeArray can't be undefined"
     );
 
-    if (isObjectEmpty(queryParams)) {
+    if (isObjectEmpty(objectParams)) {
         return { sanitizedParams: {}, forbiddenParametersFound: [] };
     }
 
     const sanitizedParams = Object.create(null);
 
-    const params = Object.keys(queryParams);
+    const params = Object.keys(objectParams);
 
     let sanitizedParam = '';
 
     for (const param of params) {
         if (
-            hasPrototypeTermsInName(queryParams, param) ||
+            hasPrototypeTermsInName(objectParams, param) ||
             forbiddenTerms.includes(param.trim()) ||
-            forbiddenTerms.includes(queryParams[param])
+            forbiddenTerms.includes(objectParams[param])
         ) {
             forbiddenParametersFound.push(param);
             continue;
         }
 
         if (expectedParamsToBeArray.includes(param.trim())) {
-            sanitizedParams[param] = queryParams[param];
+            sanitizedParams[param] = objectParams[param];
             continue;
         }
 
-        const isParamArray = queryParams[param].constructor === Array;
+        const isParamArray = objectParams[param].constructor === Array;
 
         sanitizedParam = isParamArray
-            ? getParamByOrderChoice(queryParams, param, isLastParams)
-            : queryParams[param];
+            ? getParamByOrderChoice(objectParams, param, isLastParams)
+            : objectParams[param];
 
         sanitizedParams[param] = sanitizedParam;
     }
+
     return { sanitizedParams, forbiddenParametersFound };
 }
 
