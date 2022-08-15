@@ -1,6 +1,6 @@
 const parseParams = require('./src/object-parser');
 
-const { handleForbiddenParam } = require('./src/utils/');
+const { handleForbiddenParam, plainObject } = require('./src/utils/');
 
 const defaultParameters = require('./src/initial-parameters');
 
@@ -19,8 +19,16 @@ let deepObjectSearch = defaultParameters.deepSearch;
 let ignoreBodyParse = defaultParameters.ignoreBodyParse;
 
 function hppPrevent(request, response, next) {
-    const queryParams = { ...request.query };
-    const bodyParams = { ...request.body };
+    let queryParams;
+    let bodyParams;
+
+    if (deepObjectSearch) {
+        queryParams = plainObject(request.query);
+        bodyParams = plainObject(request.body);
+    } else {
+        queryParams = { ...request.query };
+        bodyParams = { ...request.body };
+    }
 
     delete request.query;
     delete request.body;
@@ -65,6 +73,7 @@ function hppPrevent(request, response, next) {
 
     return next();
 }
+
 function resetConfig() {
     isLastParams = defaultParameters.isLastParams;
 
@@ -92,6 +101,7 @@ function getCurrentConfig() {
         deepObjectSearch,
     };
 }
+
 function config({
     takeLastOcurrences,
     blackList,

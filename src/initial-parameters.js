@@ -10,4 +10,6 @@ module.exports = Object.freeze({
     invalidParamMessage: undefined,
 
     ignoreBodyParse: false,
+
+    deepSearch: false,
 });

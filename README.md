@@ -82,6 +82,9 @@ To do so, you need to call the **_config_** method, that function accept these p
 
 -   **canIgnoreBodyParse**: This controls if you want or not to parse the top level body properties in search of prototypes patterns
 
+-   **deepSearch**: This controls if you want to perform a deep search in request body and query objects, this perform a full scanning of query and body objects.
+    but **TAKE CARE**. If the payload received is too large this can lead to a system degradation. I sugest to limit the maximum payload size of the request ( this is another best practice security). This way you will be safe to parse the full body of the request.
+
 ```
 const hppPrevent = require('hpp-prevent');
 
@@ -161,9 +164,25 @@ If you, for some reason, need to retrive the current lib configuration you can d
 
 ```
 
-And, if you want to reset lib configuration to the original state, to aply different behavior to another endpoint for example, you can do this calling teh method **resetConfig** method;
+And, if you want to reset lib configuration to the original state, to aply different behavior to another endpoint for example, you can do this calling teh method **resetConfig** method, this way:
 
-# **_VERY IMPORTANT_**
+```
+hppPrevent.resetConfig()
+```
+
+# **🔴VERY IMPORTANT!!!!!🔴**
+
+You **must** parse the request query and body before apply this middleware.
+To do so, you can use the default express json parser, **Express.json()**. This way:
+
+```
+... rest of your code
+
+app.use(Express.json()); //This has to be called before middleware
+app.use(hppPrevent.hppPrevent);
+
+... rest of your code
+```
 
 That 's all !!
 

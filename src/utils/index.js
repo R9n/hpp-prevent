@@ -35,9 +35,30 @@ function getParamByOrderChoice(parameters, param, isToTakeLastParameter) {
         : parameters[param][firsArrayIndex];
 }
 
+function auxDeepSearch(plainObject, paramName, value) {
+    if (typeof value === 'object' && !Array.isArray(value)) {
+        const keys = Object.keys(value);
+
+        for (const key of keys) {
+            auxDeepSearch(plainObject, key, value[key]);
+        }
+    } else {
+        plainObject[paramName] = value;
+    }
+}
+
+function plainObject(object) {
+    const plain = Object.create(null, {});
+
+    auxDeepSearch(plain, 'start', object);
+
+    return plain;
+}
+
 module.exports = {
     isObjectEmpty,
     handleForbiddenParam,
     hasPrototypeTermsInName,
     getParamByOrderChoice,
+    plainObject,
 };
