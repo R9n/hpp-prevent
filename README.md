@@ -202,7 +202,7 @@ Hope this package help you to make your api more secure 😀😀
 
 #### About the author
 
-Dev, System Analyst, Gamer :D
+Dev, security enthusiast, Gamer :D
 
 **_LinkedIn_**: www.linkedin.com/in/ronaldo-mp
 
