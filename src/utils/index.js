@@ -26,10 +26,6 @@ function hasPrototypeTermsInName(parameters, param) {
     );
 }
 
-function hasPrototypeTermInTopLevelTerms(param) {
-    return param.includes('__proto__') || param.includes('constructor');
-}
-
 function getParamByOrderChoice(parameters, param, isToTakeLastParameter) {
     const firsArrayIndex = 0;
     const lastArrayIndex = parameters[param].length - 1;
@@ -38,10 +34,31 @@ function getParamByOrderChoice(parameters, param, isToTakeLastParameter) {
         ? parameters[param][lastArrayIndex]
         : parameters[param][firsArrayIndex];
 }
+
+function auxDeepSearch(plainObject, paramName, value) {
+    if (typeof value === 'object' && !Array.isArray(value)) {
+        const keys = Object.keys(value);
+
+        for (const key of keys) {
+            auxDeepSearch(plainObject, key, value[key]);
+        }
+    } else {
+        plainObject[paramName] = value;
+    }
+}
+
+function plainObject(object) {
+    const plain = Object.create(null, {});
+
+    auxDeepSearch(plain, 'start', object);
+
+    return plain;
+}
+
 module.exports = {
     isObjectEmpty,
     handleForbiddenParam,
     hasPrototypeTermsInName,
     getParamByOrderChoice,
-    hasPrototypeTermInTopLevelTerms,
+    plainObject,
 };

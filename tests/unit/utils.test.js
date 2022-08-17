@@ -2,7 +2,7 @@
 const {
     getParamByOrderChoice,
     hasPrototypeTermsInName,
-} = require('../src/utils/index');
+} = require('../../src/utils/index');
 
 describe('utils/index.js', () => {
     it("Should detect object with key with prototype's pattern", () => {

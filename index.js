@@ -1,32 +1,53 @@
-const parseRequestQuery = require('./src/query-parameter-parser');
-const parseRequestBody = require('./src/body-parser');
-const { handleForbiddenParam } = require('./src/utils/');
+const parseParams = require('./src/object-parser');
 
-let isLastParams = true;
+const { handleForbiddenParam, plainObject } = require('./src/utils/');
 
-let forbiddenTerms = ['__proto__', 'constructor'];
+const defaultParameters = require('./src/initial-parameters');
 
-let expectedParamsToBeArray = [];
+let isLastParams = defaultParameters.isLastParams;
 
-let isToReturn400Reponse = false;
+let forbiddenTerms = defaultParameters.forbiddenTerms;
 
-let invalidParamMessage;
+let expectedParamsToBeArray = defaultParameters.expectedParamsToBeArray;
+
+let isToReturn400Reponse = defaultParameters.isToReturn400Reponse;
+
+let invalidParamMessage = defaultParameters.invalidParamMessage;
+
+let deepObjectSearch = defaultParameters.deepSearch;
+
+let ignoreBodyParse = defaultParameters.ignoreBodyParse;
 
 function hppPrevent(request, response, next) {
-    const queryParams = { ...request.query };
-    const bodyParams = { ...request.body };
+    let queryParams;
+    let bodyParams;
+
+    if (deepObjectSearch) {
+        queryParams = plainObject(request.query);
+        bodyParams = plainObject(request.body);
+    } else {
+        queryParams = { ...request.query };
+        bodyParams = { ...request.body };
+    }
 
     delete request.query;
     delete request.body;
 
-    const queryParamsSanitizeResult = parseRequestQuery(
+    const queryParamsSanitizeResult = parseParams(
         queryParams,
         isLastParams,
         forbiddenTerms,
         expectedParamsToBeArray
     );
 
-    const bodyParamsSanitizeResult = parseRequestBody(bodyParams);
+    const bodyParamsSanitizeResult = ignoreBodyParse
+        ? { forbiddenParametersFound: [], sanitizedParams: bodyParams }
+        : parseParams(
+              bodyParams,
+              isLastParams,
+              forbiddenTerms,
+              expectedParamsToBeArray
+          );
 
     const haveForbiddenParameters =
         bodyParamsSanitizeResult.forbiddenParametersFound.length ||
@@ -53,23 +74,66 @@ function hppPrevent(request, response, next) {
     return next();
 }
 
+function resetConfig() {
+    isLastParams = defaultParameters.isLastParams;
+
+    forbiddenTerms = defaultParameters.forbiddenTerms;
+
+    expectedParamsToBeArray = defaultParameters.expectedParamsToBeArray;
+
+    isToReturn400Reponse = defaultParameters.isToReturn400Reponse;
+
+    invalidParamMessage = defaultParameters.invalidParamMessage;
+
+    ignoreBodyParse = defaultParameters.ignoreBodyParse;
+
+    deepObjectSearch = defaultParameters.deepSearch;
+}
+
+function getCurrentConfig() {
+    return {
+        isLastParams,
+        forbiddenTerms,
+        expectedParamsToBeArray,
+        isToReturn400Reponse,
+        invalidParamMessage,
+        ignoreBodyParse,
+        deepObjectSearch,
+    };
+}
+
 function config({
     takeLastOcurrences,
     blackList,
     whiteList,
     returnBadRequestReponse,
     customInvalidParamMessage,
+    canIgnoreBodyParse,
+    deepSearch,
 }) {
-    isLastParams = takeLastOcurrences ?? isLastParams;
-    forbiddenTerms = blackList ?? forbiddenTerms;
-    expectedParamsToBeArray = whiteList ?? expectedParamsToBeArray;
-    isToReturn400Reponse = returnBadRequestReponse ?? isToReturn400Reponse;
-    invalidParamMessage = customInvalidParamMessage ?? invalidParamMessage;
+    isLastParams = takeLastOcurrences ?? defaultParameters.isLastParams;
+
+    forbiddenTerms = blackList ?? defaultParameters.forbiddenTerms;
+
+    expectedParamsToBeArray =
+        whiteList ?? defaultParameters.expectedParamsToBeArray;
+
+    isToReturn400Reponse =
+        returnBadRequestReponse ?? defaultParameters.isToReturn400Reponse;
+
+    invalidParamMessage =
+        customInvalidParamMessage ?? defaultParameters.invalidParamMessage;
+
+    ignoreBodyParse = canIgnoreBodyParse ?? defaultParameters.ignoreBodyParse;
+
+    deepObjectSearch = deepSearch ?? defaultParameters.deepSearch;
 }
 
 module.exports = {
     config,
     hppPrevent,
-    parseRequestQuery,
-    parseRequestBody,
+    parseRequestQuery: parseParams,
+    resetConfig,
+    getCurrentConfig,
+    parseParams,
 };

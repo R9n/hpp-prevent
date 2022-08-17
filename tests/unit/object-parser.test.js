@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 
-const queryParameterParser = require('../src/query-parameter-parser');
+const queryParameterParser = require('../../src/object-parser');
 
 describe('query-parameter-parser.js', () => {
     it("Should isLastParams can't be undefined error when no isLatParam property is passed to query parser ", () => {
