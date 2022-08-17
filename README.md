@@ -2,9 +2,7 @@
 
 ![buils](https://img.shields.io/appveyor/build/R9n/hpp-prevent)
 [![codecov](https://codecov.io/gh/R9n/hpp-prevent/branch/main/graph/badge.svg?token=6I00XDYH40)](https://codecov.io/gh/R9n/hpp-prevent)
-
 [![Generic badge](https://img.shields.io/badge/codestyle-standart-<COLOR>.svg)](https://shields.io/)
-
 [![Generic badge](https://img.shields.io/badge/dependencies-0-<COLOR>.svg)](https://shields.io/)
 
 ### Express middleware for prevent **_http parameter pollution_**
@@ -173,16 +171,26 @@ hppPrevent.resetConfig()
 # **🔴VERY IMPORTANT!!!!!🔴**
 
 You **must** parse the request query and body before apply this middleware.
-To do so, you can use the default express json parser, **Express.json()**. This way:
+To do so, you can use the default express json parser, **Express.json()** and **express.urlencoded({ extended: true})**. This way:
 
 ```
 ... rest of your code
 
 app.use(Express.json()); //This has to be called before middleware
+app.use(express.urlencoded({ extended: true}))  // this also come before the middleware
 app.use(hppPrevent.hppPrevent);
 
 ... rest of your code
 ```
+
+#### Performance
+
+To test the performance of the middleware I created a small api and ran a simple load test on top of two situations, a **POST** with body + query-parameters and a **GET** with query parameters.
+The result was very good. For a 300 concurrent request, this was te result
+
+![Image](tests/benchmark/result.png)
+
+As you can see, with deepSearch enabled, the request time is between 0.5 and 0.6 ms, that is very good for the first version of package :D
 
 That 's all !!
 

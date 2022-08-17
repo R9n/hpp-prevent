@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
-const hppPrevent = require('../index');
-const HppPrevent = require('../index');
+const hppPrevent = require('../../index');
+const HppPrevent = require('../../index');
 
 describe('index.js', () => {
     it('Should return a correct parsed query object when any property is passed twice', () => {
