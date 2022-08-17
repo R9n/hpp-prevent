@@ -1,6 +1,5 @@
 ## HPP-PREVENT
 
-![buils](https://img.shields.io/appveyor/build/R9n/hpp-prevent)
 [![codecov](https://codecov.io/gh/R9n/hpp-prevent/branch/main/graph/badge.svg?token=6I00XDYH40)](https://codecov.io/gh/R9n/hpp-prevent)
 [![Generic badge](https://img.shields.io/badge/codestyle-standart-<COLOR>.svg)](https://shields.io/)
 [![Generic badge](https://img.shields.io/badge/dependencies-0-<COLOR>.svg)](https://shields.io/)
