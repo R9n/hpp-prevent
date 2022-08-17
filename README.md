@@ -90,7 +90,8 @@ hppPrevent.config({
   takeLastOcurrences: false,//this tell to take the first occurrence of any duplicated param
   blackList: ['select'],
   returnBadRequestReponse: true,
-  customInvalidParamMessage: 'Invalid param, please remove it',
+  customInvalidParamMessage: 'Invalid params detected, please review the request',
+  deepSearch: true
 })
 ```
 
@@ -119,7 +120,7 @@ In case you want to do the validation only in specific cases inside your endpoin
 ```
 {
     sanitizedParams, // body parameters sanitized
-    forbiddenParametersFound  // forbidden properties found in body object and removed from teh sanitized parameters
+    forbiddenParametersFound  // forbidden properties found in body object and removed from the sanitized parameters
 }
 ```
 
@@ -156,13 +157,14 @@ If you, for some reason, need to retrive the current lib configuration you can d
       expectedParamsToBeArray: [],
       isToReturn400Reponse: false,
       invalidParamMessage: undefined,
-      ignoreBodyParse: true
+      ignoreBodyParse: true,
+      deepSearch: true
 
 }
 
 ```
 
-And, if you want to reset lib configuration to the original state, to aply different behavior to another endpoint for example, you can do this calling teh method **resetConfig** method, this way:
+And, if you want to reset lib configuration to the original state, to aply different behavior to another endpoint for example, you can do this calling the method **resetConfig** method, this way:
 
 ```
 hppPrevent.resetConfig()
