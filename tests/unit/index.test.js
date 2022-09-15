@@ -25,7 +25,8 @@ describe('index.js', () => {
             return request;
         };
 
-        const parsedRequest = HppPrevent.hppPrevent(request, response, next);
+        const generatedMiddleware = HppPrevent.hppPrevent();
+        const parsedRequest = generatedMiddleware(request, response, next);
 
         expect(parsedRequest.query.id).toBe(3);
         expect(parsedRequest.query.name).toBe('value2');
@@ -55,7 +56,9 @@ describe('index.js', () => {
         };
 
         HppPrevent.config({ takeLastOcurrences: false });
-        const parsedRequest = HppPrevent.hppPrevent(request, response, next);
+
+        const generatedMiddleware = HppPrevent.hppPrevent();
+        const parsedRequest = generatedMiddleware(request, response, next);
 
         expect(parsedRequest.query.id).toBe(1);
         expect(parsedRequest.query.name).toBe('value1');
@@ -87,7 +90,9 @@ describe('index.js', () => {
         };
 
         HppPrevent.config({ blackList: ['id'], returnBadRequestReponse: true });
-        const result = HppPrevent.hppPrevent(request, response, next);
+
+        const generatedMiddleware = HppPrevent.hppPrevent();
+        const result = generatedMiddleware(request, response, next);
 
         expect(result).toBe('Error. Invalid param');
         HppPrevent.config({ blackList: [], returnBadRequestReponse: false });
@@ -116,7 +121,9 @@ describe('index.js', () => {
         };
 
         HppPrevent.config({ blackList: ['id'], returnBadRequestReponse: true });
-        const result = HppPrevent.hppPrevent(request, response, next);
+
+        const generatedMiddleware = HppPrevent.hppPrevent();
+        const result = generatedMiddleware(request, response, next);
 
         expect(result).toBe('Error. Invalid param');
         HppPrevent.config({ blackList: [], returnBadRequestReponse: false });
@@ -146,15 +153,16 @@ describe('index.js', () => {
 
         HppPrevent.config({ whiteList: ['name'] });
 
-        const parsedRequest = HppPrevent.hppPrevent(request, response, next);
+        const generatedMiddleware = HppPrevent.hppPrevent();
+        const result = generatedMiddleware(request, response, next);
 
-        expect(parsedRequest.query.id).toBe(3);
+        expect(result.query.id).toBe(3);
 
-        expect(parsedRequest.query.name[0]).toBe('value1');
+        expect(result.query.name[0]).toBe('value1');
 
-        expect(parsedRequest.query.name[1]).toBe('value2');
+        expect(result.query.name[1]).toBe('value2');
 
-        expect(parsedRequest.query.lastName).toBe('teste');
+        expect(result.query.lastName).toBe('teste');
 
         HppPrevent.config({ whiteList: [] });
     });
@@ -182,9 +190,10 @@ describe('index.js', () => {
             return request;
         };
 
-        const parsedRequest = HppPrevent.hppPrevent(request, response, next);
+        const generatedMiddleware = HppPrevent.hppPrevent();
+        const result = generatedMiddleware(request, response, next);
 
-        expect(Object.getPrototypeOf(parsedRequest.query)).toBe(null);
+        expect(Object.getPrototypeOf(result.query)).toBe(null);
     });
 
     it('Should return a badrequest response  with custom message when a forbidden item is found in query values ', () => {
@@ -214,7 +223,9 @@ describe('index.js', () => {
             returnBadRequestReponse: true,
             customInvalidParamMessage: 'Invalid param',
         });
-        const result = HppPrevent.hppPrevent(request, response, next);
+
+        const generatedMiddleware = HppPrevent.hppPrevent();
+        const result = generatedMiddleware(request, response, next);
 
         expect(result).toBe('Invalid param');
 
@@ -251,11 +262,13 @@ describe('index.js', () => {
             blackList: ['id'],
             returnBadRequestReponse: false,
         });
-        const parsedRequest = HppPrevent.hppPrevent(request, response, next);
 
-        expect(parsedRequest.query.id).toBe(undefined);
-        expect(parsedRequest.query.name).toBe('value2');
-        expect(parsedRequest.query.lastName).toBe('teste');
+        const generatedMiddleware = HppPrevent.hppPrevent();
+        const result = generatedMiddleware(request, response, next);
+
+        expect(result.query.id).toBe(undefined);
+        expect(result.query.name).toBe('value2');
+        expect(result.query.lastName).toBe('teste');
 
         HppPrevent.config({
             blackList: [],
@@ -285,9 +298,10 @@ describe('index.js', () => {
             return request;
         };
 
-        const parsedRequest = HppPrevent.hppPrevent(request, response, next);
+        const generatedMiddleware = HppPrevent.hppPrevent();
+        const result = generatedMiddleware(request, response, next);
 
-        expect(Object.getPrototypeOf(parsedRequest.query)).toBe(null);
+        expect(Object.getPrototypeOf(result.query)).toBe(null);
     });
     it('Should remove invalid parameters from request body', () => {
         const request = {
@@ -312,7 +326,8 @@ describe('index.js', () => {
             return request;
         };
 
-        const result = HppPrevent.hppPrevent(request, response, next);
+        const generatedMiddleware = HppPrevent.hppPrevent();
+        const result = generatedMiddleware(request, response, next);
 
         expect(result.body.teste).toBe(1);
         expect(result.body.pollutedParam).toBe(2);
@@ -342,7 +357,8 @@ describe('index.js', () => {
         };
         HppPrevent.config({ canIgnoreBodyParse: true });
 
-        const result = HppPrevent.hppPrevent(request, response, next);
+        const generatedMiddleware = HppPrevent.hppPrevent();
+        const result = generatedMiddleware(request, response, next);
 
         expect(result.body.teste).toBe(1);
         expect(result.body.teste2[0]).toBe(1);
@@ -391,14 +407,55 @@ describe('index.js', () => {
         };
 
         HppPrevent.config({ deepSearch: true, blackList: ['id'] });
-        const parsedRequest = await HppPrevent.hppPrevent(
-            request,
-            response,
-            next
-        );
-        expect(parsedRequest.query.id).toBe(undefined);
-        expect(parsedRequest.query.name).toBe('value2');
-        expect(parsedRequest.query.lastName).toBe('teste');
+
+        const generatedMiddleware = HppPrevent.hppPrevent();
+        const result = generatedMiddleware(request, response, next);
+
+        expect(result.query.id).toBe(undefined);
+        expect(result.query.name).toBe('value2');
+        expect(result.query.lastName).toBe('teste');
+        hppPrevent.resetConfig();
+    });
+    it('Should override default config with middleware config', async () => {
+        const request = {
+            query: {
+                id3: [1, 2, 3],
+                id: [2],
+                name: ['value1', 'value2'],
+                lastName: 'teste',
+            },
+            body: {
+                id3: [1, 2, 3],
+                id: [1],
+                name: ['value1', 'value2'],
+                lastName: 'teste',
+            },
+        };
+        const response = {
+            status: () => {
+                return {
+                    send: () => {
+                        return this;
+                    },
+                };
+            },
+        };
+
+        const next = () => {
+            return request;
+        };
+
+        HppPrevent.config({ deepSearch: true, blackList: ['id'] });
+
+        const generatedMiddleware = HppPrevent.hppPrevent({
+            blackList: ['id3'],
+        });
+
+        const result = generatedMiddleware(request, response, next);
+
+        expect(result.query.id3).toBe(undefined);
+        expect(result.query.name).toBe('value2');
+        expect(result.query.lastName).toBe('teste');
         hppPrevent.resetConfig();
     });
 });
