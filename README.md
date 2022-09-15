@@ -3,6 +3,7 @@
 [![codecov](https://codecov.io/gh/R9n/hpp-prevent/branch/main/graph/badge.svg?token=6I00XDYH40)](https://codecov.io/gh/R9n/hpp-prevent)
 [![Generic badge](https://img.shields.io/badge/codestyle-standart-<COLOR>.svg)](https://shields.io/)
 [![Generic badge](https://img.shields.io/badge/dependencies-0-<COLOR>.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/version-2.0.0-<BLUE>.svg)](https://shields.io/)
 
 ### Express middleware for prevent **_http parameter pollution_**
 
@@ -196,6 +197,62 @@ As you can see, with deepSearch enabled, the request time is between 0.5 and 0.6
 That 's all !!
 
 Hope this package help you to make your api more secure 😀😀
+
+### CHANGE LOG ☑️Version 2.0.0 ☑️
+
+Starting at version 2.0.0, to use the middleware it is **`necessary`** to call it in the form of a function.
+This is due to the optimization made so that it is possible to pass custom parameters to each endpoint, without the need to reset the lib configuration for each endpoint.
+This is the new way to apply the middleware
+
+```
+const express = require("express");
+const httpPrevent = require("../hpp-prevent/index");
+const app = express();
+app.use(express.json());
+
+❌The config method is deprecated and it is no needed anymore ❌
+/*
+httpPrevent.config({
+  takeLastOcurrences: true,
+  deepSearch: true,
+  whiteList: ["friends", "tags"],
+});
+*/
+
+✅ Now you pass the config directly to the middleware when using as a global middleware for all routers  ✅
+
+app.use(httpPrevent.hppPrevent({
+  takeLastOcurrences: true,
+  deepSearch: true,
+  whiteList: ["friends", "tags"],
+}));
+```
+
+❌ When using the middleware as an endpoint middleware, now you can pass an custom config for that endpoint especifically without the need of reconfigure the hole lib to apply an different behavior for that endpoint❌
+
+```
+httpPrevent.config({
+  takeLastOcurrences: true,
+  deepSearch: true,
+  whiteList: ["friends", "tags"],
+});
+
+app.post("/", httpPrevent.hppPrevent, (request, response) => {
+  return response.send(request.body);
+});
+```
+
+✅The new way is much more cleaner and easy to use ✅
+
+```
+app.post("/", httpPrevent.hppPrevent({
+  takeLastOcurrences: true,
+  deepSearch: true,
+  whiteList: ["friends", "tags"],
+}), (request, response) => {
+  return response.send(request.body);
+});
+```
 
 #### License
 
