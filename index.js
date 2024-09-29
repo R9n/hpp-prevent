@@ -1,22 +1,16 @@
 const parseParams = require('./src/object-parser');
-
 const { handleForbiddenParam, plainObject } = require('./src/utils/');
-
 const defaultParameters = require('./src/initial-parameters');
 
-let isLastParams = defaultParameters.isLastParams;
-
-let forbiddenTerms = defaultParameters.forbiddenTerms;
-
-let expectedParamsToBeArray = defaultParameters.expectedParamsToBeArray;
-
-let isToReturn400Reponse = defaultParameters.isToReturn400Reponse;
-
-let invalidParamMessage = defaultParameters.invalidParamMessage;
-
-let deepObjectSearch = defaultParameters.deepSearch;
-
-let ignoreBodyParse = defaultParameters.ignoreBodyParse;
+let {
+    isLastParams,
+    forbiddenTerms,
+    expectedParamsToBeArray,
+    isToReturn400Reponse,
+    invalidParamMessage,
+    deepSearch: deepObjectSearch,
+    ignoreBodyParse,
+} = defaultParameters;
 
 function hppPrevent({
     takeLastOcurrences,
@@ -27,93 +21,82 @@ function hppPrevent({
     canIgnoreBodyParse,
     deepSearch,
 } = {}) {
-    const isLastParamsConfig = takeLastOcurrences ?? isLastParams;
+    const config = {
+        isLastParamsConfig: takeLastOcurrences ?? isLastParams,
+        forbiddenTermsConfig: blackList ?? forbiddenTerms,
+        expectedParamsToBeArrayConfig: whiteList ?? expectedParamsToBeArray,
+        isToReturn400ReponseConfig:
+            returnBadRequestReponse ?? isToReturn400Reponse,
+        invalidParamMessageConfig:
+            customInvalidParamMessage ?? invalidParamMessage,
+        deepObjectSearchConfig: canIgnoreBodyParse ?? deepObjectSearch,
+        ignoreBodyParseConfig: deepSearch ?? ignoreBodyParse,
+    };
 
-    const forbiddenTermsConfig = blackList ?? forbiddenTerms;
+    return (req, res, next) => {
+        const { query, body } = req;
 
-    const expectedParamsToBeArrayConfig = whiteList ?? expectedParamsToBeArray;
+        const queryParams = config.deepObjectSearchConfig
+            ? plainObject(query)
+            : { ...query };
+        const bodyParams = config.deepObjectSearchConfig
+            ? plainObject(body)
+            : { ...body };
 
-    const isToReturn400ReponseConfig =
-        returnBadRequestReponse ?? isToReturn400Reponse;
-
-    const invalidParamMessageConfig =
-        customInvalidParamMessage ?? invalidParamMessage;
-
-    const deepObjectSearchConfig = canIgnoreBodyParse ?? deepObjectSearch;
-
-    const ignoreBodyParseConfig = deepSearch ?? ignoreBodyParse;
-
-    return (request, response, next) => {
-        let queryParams;
-        let bodyParams;
-
-        if (deepObjectSearchConfig) {
-            queryParams = plainObject(request.query);
-            bodyParams = plainObject(request.body);
-        } else {
-            queryParams = { ...request.query };
-            bodyParams = { ...request.body };
-        }
-
-        delete request.query;
-        delete request.body;
+        delete req.query;
+        delete req.body;
 
         const queryParamsSanitizeResult = parseParams(
             queryParams,
-            isLastParamsConfig,
-            forbiddenTermsConfig,
-            expectedParamsToBeArrayConfig
+            config.isLastParamsConfig,
+            config.forbiddenTermsConfig,
+            config.expectedParamsToBeArrayConfig
         );
 
-        const bodyParamsSanitizeResult = ignoreBodyParseConfig
+        const bodyParamsSanitizeResult = config.ignoreBodyParseConfig
             ? { forbiddenParametersFound: [], sanitizedParams: bodyParams }
             : parseParams(
                   bodyParams,
-                  isLastParamsConfig,
-                  forbiddenTermsConfig,
-                  expectedParamsToBeArrayConfig
+                  config.isLastParamsConfig,
+                  config.forbiddenTermsConfig,
+                  config.expectedParamsToBeArrayConfig
               );
-
-        const haveForbiddenParameters =
-            bodyParamsSanitizeResult.forbiddenParametersFound.length ||
-            queryParamsSanitizeResult.forbiddenParametersFound.length;
 
         const forbiddenParametersFound = [
             ...bodyParamsSanitizeResult.forbiddenParametersFound,
             ...queryParamsSanitizeResult.forbiddenParametersFound,
         ];
 
-        if (haveForbiddenParameters && isToReturn400ReponseConfig) {
-            request.query = {};
-            request.body = {};
+        if (
+            forbiddenParametersFound.length &&
+            config.isToReturn400ReponseConfig
+        ) {
+            req.query = {};
+            req.body = {};
             return handleForbiddenParam(
-                invalidParamMessageConfig,
+                config.invalidParamMessageConfig,
                 forbiddenParametersFound,
-                response
+                res
             );
         }
 
-        request.query = queryParamsSanitizeResult.sanitizedParams;
-        request.body = bodyParamsSanitizeResult.sanitizedParams;
+        req.query = queryParamsSanitizeResult.sanitizedParams;
+        req.body = bodyParamsSanitizeResult.sanitizedParams;
 
         return next();
     };
 }
 
 function resetConfig() {
-    isLastParams = defaultParameters.isLastParams;
-
-    forbiddenTerms = defaultParameters.forbiddenTerms;
-
-    expectedParamsToBeArray = defaultParameters.expectedParamsToBeArray;
-
-    isToReturn400Reponse = defaultParameters.isToReturn400Reponse;
-
-    invalidParamMessage = defaultParameters.invalidParamMessage;
-
-    ignoreBodyParse = defaultParameters.ignoreBodyParse;
-
-    deepObjectSearch = defaultParameters.deepSearch;
+    ({
+        isLastParams,
+        forbiddenTerms,
+        expectedParamsToBeArray,
+        isToReturn400Reponse,
+        invalidParamMessage,
+        deepObjectSearch,
+        ignoreBodyParse,
+    } = defaultParameters);
 }
 
 function getCurrentConfig() {
@@ -123,27 +106,19 @@ function getCurrentConfig() {
         expectedParamsToBeArray,
         isToReturn400Reponse,
         invalidParamMessage,
-        ignoreBodyParse,
         deepObjectSearch,
+        ignoreBodyParse,
     };
 }
 
 /**
  @deprecated Since version 2.0.0
-
- Now you can apply configuration directly to the middleware. This way
-
- ```
+ Now you can apply configuration directly to the middleware. This way:
  app.use(httpPrevent.hppPrevent({
-
-  takeLastOcurrences: true,
-
-  deepSearch: true,
-
-  whiteList: ["friends", "tags"],
-
-}));
-```
+   takeLastOcurrences: true,
+   deepSearch: true,
+   whiteList: ["friends", "tags"],
+ }));
 **/
 function config({
     takeLastOcurrences,
@@ -154,24 +129,18 @@ function config({
     canIgnoreBodyParse,
     deepSearch,
 }) {
+    // Atribuindo os parâmetros recebidos ou mantendo os valores padrões de `defaultParameters`
     isLastParams = takeLastOcurrences ?? defaultParameters.isLastParams;
-
     forbiddenTerms = blackList ?? defaultParameters.forbiddenTerms;
-
     expectedParamsToBeArray =
         whiteList ?? defaultParameters.expectedParamsToBeArray;
-
     isToReturn400Reponse =
         returnBadRequestReponse ?? defaultParameters.isToReturn400Reponse;
-
     invalidParamMessage =
         customInvalidParamMessage ?? defaultParameters.invalidParamMessage;
-
-    ignoreBodyParse = canIgnoreBodyParse ?? defaultParameters.ignoreBodyParse;
-
     deepObjectSearch = deepSearch ?? defaultParameters.deepSearch;
+    ignoreBodyParse = canIgnoreBodyParse ?? defaultParameters.ignoreBodyParse;
 }
-
 module.exports = {
     config,
     hppPrevent,

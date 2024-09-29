@@ -198,28 +198,14 @@ That 's all !!
 
 Hope this package help you to make your api more secure 😀😀
 
-### CHANGE LOG ☑️Version 2.0.0 ☑️
-
-Starting at version 2.0.0, to use the middleware it is **`necessary`** to call it in the form of a function.
-This is due to the optimization made so that it is possible to pass custom parameters to each endpoint, without the need to reset the lib configuration for each endpoint.
-This is the new way to apply the middleware
-
 ```
 const express = require("express");
 const httpPrevent = require("../hpp-prevent/index");
 const app = express();
 app.use(express.json());
 
-❌The config method is deprecated and it is no needed anymore ❌
-/*
-httpPrevent.config({
-  takeLastOcurrences: true,
-  deepSearch: true,
-  whiteList: ["friends", "tags"],
-});
-*/
 
-✅ Now you pass the config directly to the middleware when using as a global middleware for all routers  ✅
+✅ Pass the config directly to the middleware when using as a global middleware for all routers  ✅
 
 app.use(httpPrevent.hppPrevent({
   takeLastOcurrences: true,
@@ -228,21 +214,7 @@ app.use(httpPrevent.hppPrevent({
 }));
 ```
 
-❌ When using the middleware as an endpoint middleware, now you can pass an custom config for that endpoint especifically without the need of reconfigure the hole lib to apply an different behavior for that endpoint❌
-
-```
-httpPrevent.config({
-  takeLastOcurrences: true,
-  deepSearch: true,
-  whiteList: ["friends", "tags"],
-});
-
-app.post("/", httpPrevent.hppPrevent, (request, response) => {
-  return response.send(request.body);
-});
-```
-
-✅The new way is much more cleaner and easy to use ✅
+✅How to use as middleware level function ✅
 
 ```
 app.post("/", httpPrevent.hppPrevent({
