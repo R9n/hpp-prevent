@@ -1,0 +1,13 @@
+{
+    "name": "hpp-prevent-demo",
+    "version": "1.0.0",
+    "description": "Demo local para testar o middleware hpp-prevent",
+    "private": true,
+    "scripts": {
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "express": "^4.18.2",
+        "hpp-prevent": "file:.."
+    }
+}

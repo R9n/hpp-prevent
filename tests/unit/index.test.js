@@ -55,7 +55,7 @@ describe('index.js', () => {
             return request;
         };
 
-        HppPrevent.config({ takeLastOcurrences: false });
+        HppPrevent.config({ takeLastOccurrences: false });
 
         const generatedMiddleware = HppPrevent.hppPrevent();
         const parsedRequest = generatedMiddleware(request, response, next);
@@ -64,7 +64,26 @@ describe('index.js', () => {
         expect(parsedRequest.query.name).toBe('value1');
         expect(parsedRequest.query.lastName).toBe('teste');
 
-        HppPrevent.config({ takeLastOcurrences: true });
+        HppPrevent.config({ takeLastOccurrences: true });
+    });
+
+    it('Should use empty object when req.query is null or undefined', () => {
+        const request = {
+            query: null,
+            body: { name: 'test' },
+        };
+        const response = {
+            status: () => ({
+                send: () => ({}),
+            }),
+        };
+        const next = () => request;
+
+        const generatedMiddleware = HppPrevent.hppPrevent();
+        const result = generatedMiddleware(request, response, next);
+
+        expect(result.query).toEqual({});
+        expect(result.body.name).toBe('test');
     });
 
     it('Should return a badrequest response when a forbidden item is found in query params ', () => {
@@ -89,13 +108,13 @@ describe('index.js', () => {
             return request;
         };
 
-        HppPrevent.config({ blackList: ['id'], returnBadRequestReponse: true });
+        HppPrevent.config({ blackList: ['id'], returnBadRequestResponse: true });
 
         const generatedMiddleware = HppPrevent.hppPrevent();
         const result = generatedMiddleware(request, response, next);
 
         expect(result).toBe('Error. Invalid param');
-        HppPrevent.config({ blackList: [], returnBadRequestReponse: false });
+        HppPrevent.config({ blackList: [], returnBadRequestResponse: false });
     });
 
     it('Should return a badrequest response when a forbidden item is found in query values ', () => {
@@ -120,13 +139,13 @@ describe('index.js', () => {
             return request;
         };
 
-        HppPrevent.config({ blackList: ['id'], returnBadRequestReponse: true });
+        HppPrevent.config({ blackList: ['id'], returnBadRequestResponse: true });
 
         const generatedMiddleware = HppPrevent.hppPrevent();
         const result = generatedMiddleware(request, response, next);
 
         expect(result).toBe('Error. Invalid param');
-        HppPrevent.config({ blackList: [], returnBadRequestReponse: false });
+        HppPrevent.config({ blackList: [], returnBadRequestResponse: false });
     });
 
     it('Should ignore succesfully values passed in whitelist array', () => {
@@ -220,7 +239,7 @@ describe('index.js', () => {
 
         HppPrevent.config({
             blackList: ['id'],
-            returnBadRequestReponse: true,
+            returnBadRequestResponse: true,
             customInvalidParamMessage: 'Invalid param',
         });
 
@@ -231,7 +250,7 @@ describe('index.js', () => {
 
         HppPrevent.config({
             blackList: [],
-            returnBadRequestReponse: false,
+            returnBadRequestResponse: false,
             customInvalidParamMessage: undefined,
         });
     });
@@ -260,7 +279,7 @@ describe('index.js', () => {
 
         HppPrevent.config({
             blackList: ['id'],
-            returnBadRequestReponse: false,
+            returnBadRequestResponse: false,
         });
 
         const generatedMiddleware = HppPrevent.hppPrevent();
@@ -457,5 +476,73 @@ describe('index.js', () => {
         expect(result.query.name).toBe('value2');
         expect(result.query.lastName).toBe('teste');
         hppPrevent.resetConfig();
+    });
+
+    it('Should handle empty query and body when deepSearch is true', () => {
+        const request = {
+            query: {},
+            body: {},
+        };
+        const response = {
+            status: () => ({
+                send: () => ({}),
+            }),
+        };
+        const next = () => request;
+
+        HppPrevent.config({ deepSearch: true });
+
+        const generatedMiddleware = HppPrevent.hppPrevent();
+        const result = generatedMiddleware(request, response, next);
+
+        expect(result.query).toEqual({});
+        expect(result.body).toEqual({});
+
+        hppPrevent.resetConfig();
+    });
+
+    it('Should preserve nested structure when deepSearch is true', () => {
+        const request = {
+            query: {},
+            body: {
+                all: { teste: 'p' },
+                teste: 'oi',
+            },
+        };
+        const response = {
+            status: () => ({
+                send: () => ({}),
+            }),
+        };
+        const next = () => request;
+
+        HppPrevent.config({ deepSearch: true });
+
+        const generatedMiddleware = HppPrevent.hppPrevent();
+        const result = generatedMiddleware(request, response, next);
+
+        expect(result.body.all).toEqual({ teste: 'p' });
+        expect(result.body.teste).toBe('oi');
+        expect(result.body).toHaveProperty('all');
+        expect(result.body).toHaveProperty('teste');
+
+        hppPrevent.resetConfig();
+    });
+
+    it('Should handle empty query and body when deepSearch is true', () => {
+        const request = {
+            query: {},
+            body: {},
+        };
+        const response = {
+            status: () => ({ send: () => ({}) }),
+        };
+        const next = () => request;
+
+        const middleware = HppPrevent.hppPrevent({ deepSearch: true });
+        const result = middleware(request, response, next);
+
+        expect(result.query).toEqual({});
+        expect(result.body).toEqual({});
     });
 });
