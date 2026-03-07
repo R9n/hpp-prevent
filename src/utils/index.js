@@ -1,57 +1,38 @@
 function handleForbiddenParam(invalidParamMessage, param, response) {
     const badRequestStatusCode = 400;
-
-    if (invalidParamMessage) {
-        return response.status(badRequestStatusCode).send(invalidParamMessage);
-    }
-    return response
-        .status(badRequestStatusCode)
-        .send(`Error. Invalid param: ${param}`);
+    const message = invalidParamMessage || 'Error. Invalid param';
+    return response.status(badRequestStatusCode).send(message);
 }
 
 function isObjectEmpty(obj) {
-    // eslint-disable-next-line no-unreachable-loop
-    for (const x in obj) {
-        return false;
-    }
-    return true;
+    return Object.keys(obj).length === 0;
 }
+
 function hasPrototypeTermsInName(parameters, param) {
     const stringParamContent = String(parameters[param]);
-    return (
-        param.includes('__proto__') ||
-        param.includes('constructor') ||
-        stringParamContent.includes('__proto__') ||
-        stringParamContent.includes('constructor')
+    return ['__proto__', 'constructor'].some(
+        (term) => param.includes(term) || stringParamContent.includes(term)
     );
 }
 
 function getParamByOrderChoice(parameters, param, isToTakeLastParameter) {
-    const firsArrayIndex = 0;
-    const lastArrayIndex = parameters[param].length - 1;
-
-    return isToTakeLastParameter
-        ? parameters[param][lastArrayIndex]
-        : parameters[param][firsArrayIndex];
+    const index = isToTakeLastParameter ? parameters[param].length - 1 : 0;
+    return parameters[param][index];
 }
 
 function auxDeepSearch(plainObject, paramName, value) {
-    if (typeof value === 'object' && !Array.isArray(value)) {
-        const keys = Object.keys(value);
-
-        for (const key of keys) {
-            auxDeepSearch(plainObject, key, value[key]);
-        }
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+        Object.entries(value).forEach(([key, val]) => {
+            auxDeepSearch(plainObject, key, val);
+        });
     } else {
         plainObject[paramName] = value;
     }
 }
 
 function plainObject(object) {
-    const plain = Object.create(null, {});
-
+    const plain = Object.create(null);
     auxDeepSearch(plain, 'start', object);
-
     return plain;
 }
 

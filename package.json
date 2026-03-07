@@ -1,6 +1,6 @@
 {
     "name": "hpp-prevent",
-    "version": "2.0.0",
+    "version": "3.0.0",
     "description": "express middleware to prevent http parameter pollution atack",
     "main": "index.js",
     "scripts": {

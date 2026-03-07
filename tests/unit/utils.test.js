@@ -2,6 +2,7 @@
 const {
     getParamByOrderChoice,
     hasPrototypeTermsInName,
+    plainObject,
 } = require('../../src/utils/index');
 
 describe('utils/index.js', () => {
@@ -49,5 +50,34 @@ describe('utils/index.js', () => {
 
         expect(result1).toBe(3);
         expect(result2).toBe(1);
+    });
+
+    describe('plainObject', () => {
+        it('Should flatten nested object into plain key-value pairs', () => {
+            const nested = {
+                all: { teste: 'p' },
+                level: { deep: { value: 42 } },
+            };
+            const result = plainObject(nested);
+            expect(result).toEqual({
+                teste: 'p',
+                value: 42,
+            });
+        });
+
+        it('Should handle object with primitive values only', () => {
+            const simple = { a: 1, b: 'text' };
+            const result = plainObject(simple);
+            expect(result).toEqual({ a: 1, b: 'text' });
+        });
+
+        it('Should overwrite duplicate keys with last occurrence (depth-first)', () => {
+            const withDuplicates = {
+                first: { id: 1 },
+                second: { id: 2 },
+            };
+            const result = plainObject(withDuplicates);
+            expect(result.id).toBe(2);
+        });
     });
 });

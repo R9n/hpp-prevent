@@ -5,7 +5,7 @@ module.exports = Object.freeze({
 
     expectedParamsToBeArray: [],
 
-    isToReturn400Reponse: false,
+    isToReturn400Response: false,
 
     invalidParamMessage: undefined,
 
